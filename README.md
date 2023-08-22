@@ -1,8 +1,8 @@
 # Fizzle
 
-(This is a **WIP** project, so it is not ready for use yet)
+(This is a **WIP** project, so it is not ready for use yet, however, feel free to try it out and submit issues with your feature requests!)
 
-A **WIP** Command Line utility to start local servers under the \*.local domains using Docker, Traefik and mDNS (multi-cast DNS). It supports both HTTP and HTTPS.
+A Command Line utility to start local servers under the \*.local domains using Docker, Traefik and mDNS (multi-cast DNS). It supports both HTTP and HTTPS.
 
 ## What it does
 
@@ -11,6 +11,10 @@ Fizzle creates a Traefik container that acts as a reverse proxy for your local s
 Traefik will then launch a global entrypoint on port 80 and 443. It will then listen for requests on the registered \*.local domains and route them to the correct container.
 
 The mDNS daemon is then launched to listen for DNS requests for the \*.local domains and route them to your local machine on your network if they are registered (in your Fizzle Traefik docker network).
+
+Upon running the `up` command in a project directory, Fizzle will create a docker container for your app and connect it to your local Traefik network. The container is either created from your own Dockerfile (which must use the /app directory as the working directory) or from a Dockerfile that Fizzle generates for you.
+
+The container is then started using the `npm start` script.
 
 ## Output Example
 
