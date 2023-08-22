@@ -1,0 +1,24 @@
+{
+  "name": "fizzle-cli",
+  "version": "1.0.0",
+  "description": "Launch apps and access them using a *.local domain.",
+  "main": "src/index.mjs",
+  "bin": {
+    "fizzle": "src/index.mjs"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Antoine B. <antoine@jiveoff.fr>",
+  "license": "ISC",
+  "dependencies": {
+    "@clack/core": "^0.3.3",
+    "@clack/prompts": "^0.7.0",
+    "dockerode": "^3.3.5",
+    "minimist": "^1.2.8",
+    "mkcert": "^1.5.1",
+    "multicast-dns": "^7.2.5"
+  }
+}
