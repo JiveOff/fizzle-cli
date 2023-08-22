@@ -4,6 +4,12 @@
 
 A Command Line utility to start local servers under the \*.local domains using Docker, Traefik and mDNS (multi-cast DNS). It supports both HTTP and HTTPS.
 
+## Commands
+
+- `npx fizzle start` - Starts Traefik and the mDNS daemon
+- `npx fizzle stop` - Stops Traefik and the mDNS daemon
+- `npx fizzle up` - Starts your app in a docker container and connects it to the local Traefik network
+
 ## What it does
 
 Fizzle creates a Traefik container that acts as a reverse proxy for your local servers. The CLI will also generate a local certificate for you and configure Traefik to use it.
@@ -14,7 +20,7 @@ The mDNS daemon is then launched to listen for DNS requests for the \*.local dom
 
 Upon running the `up` command in a project directory, Fizzle will create a docker container for your app and connect it to your local Traefik network. The container is either created from your own Dockerfile (which must use the /app directory as the working directory) or from a Dockerfile that Fizzle generates for you.
 
-The container is then started using the `npm start` script.
+The container is then started using the start script that you provided during the up command.
 
 ## Output Example
 
@@ -45,6 +51,9 @@ The container is then started using the `npm start` script.
 │
 ◇  What is the name of your app?
 │  example-express-app
+│
+◇  What is the command to start your app?
+│  npm start
 │
 ◇  What port does your app run on?
 │  8080
