@@ -2,11 +2,7 @@
 
 (This is a **WIP** project, so it is not ready for use yet)
 
-A **WIP** Command Line utility to start local servers under the \*.local domains using Docker, Traefik and mDNS (multi-cast DNS).
-
-- Supports multiple domains
-- Supports multiple ports
-- Supports HTTP and HTTPS
+A **WIP** Command Line utility to start local servers under the \*.local domains using Docker, Traefik and mDNS (multi-cast DNS). It supports both HTTP and HTTPS.
 
 ## What it does
 
