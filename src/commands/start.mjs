@@ -6,6 +6,8 @@ import { mkdirSync } from "fs";
 import { spawn } from "child_process";
 import { PROXY_NAME, PROXY_NETWORK, docker } from "../clients/docker.mjs";
 import { __dirname, pluginDir } from "../utils/dir.mjs";
+import { isMdnsDaemonRunning } from "../utils/mdns.mjs";
+import { getTraefikStatus } from "../utils/traefik.mjs";
 
 const createNetwork = async () => {
   const networksWithTraefik = await docker.listNetworks({
@@ -22,14 +24,14 @@ const createNetwork = async () => {
 
 const createCert = async () => {
   const certPath = path.join(pluginDir, "docker/traefik/certs");
-  const certExists = await existsSync(certPath);
+  const certExists = existsSync(certPath);
 
   if (certExists) {
     log.success(`Local certificate already exists, skipping...`);
     return;
   }
 
-  await mkdirSync(certPath);
+  mkdirSync(certPath);
 
   const authority = await mkcert.createCA({
     organization: "Fizzle Local CA",
@@ -46,28 +48,16 @@ const createCert = async () => {
     caCert: authority.cert
   });
 
-  await writeFileSync(path.join(certPath, "cert.pem"), cert.cert);
-  await writeFileSync(path.join(certPath, "key.pem"), cert.key);
+  writeFileSync(path.join(certPath, "cert.pem"), cert.cert);
+  writeFileSync(path.join(certPath, "key.pem"), cert.key);
 
   log.success(`Local certificate created!`);
 };
 
-export const isTraefikRunning = async () => {
-  const traefikContainer = await docker.listContainers({
-    all: true,
-    filters: { name: [PROXY_NAME] }
-  });
-
-  return traefikContainer.length > 0;
-};
-
 const setupTraefik = async () => {
-  const traefikContainer = await docker.listContainers({
-    all: true,
-    filters: { name: [PROXY_NAME] }
-  });
+  const traefikStatus = await getTraefikStatus();
 
-  if (traefikContainer.length > 0) {
+  if (traefikStatus.running) {
     log.success(`Traefik already running, skipping...`);
     return;
   }
@@ -86,75 +76,91 @@ const setupTraefik = async () => {
 
   message("Starting Traefik container");
 
-  const traefik = await docker.createContainer({
-    Image: "traefik:latest",
-    name: PROXY_NAME,
-    ExposedPorts: {
-      "80/tcp": {},
-      "443/tcp": {}
-    },
-    HostConfig: {
-      RestartPolicy: {
-        Name: "always"
+  if (traefikStatus.created) {
+    const traefikContainer = await docker.getContainer(PROXY_NAME);
+    await traefikContainer.start();
+    stop("Traefik started!");
+    return;
+  } else {
+    const traefik = await docker.createContainer({
+      Image: "traefik:latest",
+      name: PROXY_NAME,
+      ExposedPorts: {
+        "80/tcp": {},
+        "443/tcp": {}
       },
-      NetworkMode: PROXY_NETWORK,
-      PortBindings: {
-        "80/tcp": [
+      HostConfig: {
+        RestartPolicy: {
+          Name: "always"
+        },
+        NetworkMode: PROXY_NETWORK,
+        PortBindings: {
+          "80/tcp": [
+            {
+              HostPort: "80"
+            }
+          ],
+          "443/tcp": [
+            {
+              HostPort: "443"
+            }
+          ]
+        },
+        Mounts: [
           {
-            HostPort: "80"
-          }
-        ],
-        "443/tcp": [
+            Type: "bind",
+            Source: "/var/run/docker.sock",
+            Target: "/var/run/docker.sock"
+          },
           {
-            HostPort: "443"
+            Type: "bind",
+            Source: path.join(pluginDir, "docker/traefik/traefik.yml"),
+            Target: "/etc/traefik/traefik.yml"
+          },
+          {
+            Type: "bind",
+            Source: path.join(pluginDir, "docker/traefik/provider.yml"),
+            Target: "/etc/traefik/provider.yml"
+          },
+          {
+            Type: "bind",
+            Source: path.join(pluginDir, "docker/traefik/certs"),
+            Target: "/etc/traefik/certs"
           }
         ]
-      },
-      Mounts: [
-        {
-          Type: "bind",
-          Source: "/var/run/docker.sock",
-          Target: "/var/run/docker.sock"
-        },
-        {
-          Type: "bind",
-          Source: path.join(pluginDir, "docker/traefik/traefik.yml"),
-          Target: "/etc/traefik/traefik.yml"
-        },
-        {
-          Type: "bind",
-          Source: path.join(pluginDir, "docker/traefik/provider.yml"),
-          Target: "/etc/traefik/provider.yml"
-        },
-        {
-          Type: "bind",
-          Source: path.join(pluginDir, "docker/traefik/certs"),
-          Target: "/etc/traefik/certs"
-        }
-      ]
-    }
-  });
+      }
+    });
 
-  await traefik.start();
+    await traefik.start();
+  }
 
   stop("Traefik started!");
 };
 
-const startMdnsDaemon = async () => {
+const startMdnsDaemon = () => {
+  const mdnsDaemonExists = isMdnsDaemonRunning();
+
+  if (mdnsDaemonExists) {
+    log.success(`mDNS daemon already running, skipping...`);
+    return;
+  }
+
   const mdnsDaemon = spawn("node", ["src/daemon.js"], {
     cwd: pluginDir,
     detached: true,
     stdio: "ignore"
   });
 
+  writeFileSync(path.join(pluginDir, "mdns.pid"), String(mdnsDaemon.pid));
+
   mdnsDaemon.unref();
 
-  log.success(`mDNS daemon started`);
+  log.success(`mDNS daemon started with PID ${mdnsDaemon.pid}`);
 };
 
 export default async () => {
   await createNetwork();
   await createCert();
   await setupTraefik();
-  await startMdnsDaemon();
+  startMdnsDaemon();
 };

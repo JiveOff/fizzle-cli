@@ -2,16 +2,18 @@ import fs from "node:fs";
 import path from "node:path";
 import { log, spinner, confirm, text } from "@clack/prompts";
 import { PROXY_NETWORK, docker } from "../clients/docker.mjs";
-import { isTraefikRunning } from "./start.mjs";
 import { __dirname } from "../utils/dir.mjs";
+import { getTraefikStatus } from "../utils/traefik.mjs";
+import { isMdnsDaemonRunning } from "../utils/mdns.mjs";
 
 const cwd = process.cwd();
 
 export default async () => {
-  const traefikRunning = await isTraefikRunning();
+  const traefikStatus = await getTraefikStatus();
+  const mdnsDaemonExists = isMdnsDaemonRunning();
 
-  if (!traefikRunning) {
-    log.error("Traefik is not running, please run `npx fizzle start` beforehand.");
+  if (!traefikStatus.running && !mdnsDaemonExists) {
+    log.error("Traefik & mDns daemon are not running, please run `npx fizzle start`.");
     return;
   }
 
