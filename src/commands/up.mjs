@@ -5,6 +5,10 @@ import { PROXY_NETWORK, docker } from "../clients/docker.mjs";
 import { confirm } from "@clack/prompts";
 import { text } from "@clack/prompts";
 import { isTraefikRunning } from "./docker-start.mjs";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const cwd = process.cwd();
 
