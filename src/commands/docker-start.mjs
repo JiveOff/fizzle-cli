@@ -147,11 +147,14 @@ const setupTraefik = async () => {
 
 const startMdnsDaemon = async () => {
   const mdnsDaemon = spawn("node", ["src/daemon.js"], {
+    cwd: pwd,
     detached: true,
     stdio: "ignore",
   });
 
   mdnsDaemon.unref();
+
+  log.success(`mDNS daemon started`);
 };
 
 export default async () => {
