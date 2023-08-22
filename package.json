@@ -1,7 +1,12 @@
 {
   "name": "fizzle-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Launch apps and access them using a *.local domain.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JiveOff/fizzle-cli.git"
+  },
+  "homepage": "https://github.com/JiveOff/fizzle-cli#fizzle",
   "main": "src/index.mjs",
   "bin": {
     "fizzle": "src/index.mjs"
@@ -12,7 +17,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Antoine B. <antoine@jiveoff.fr>",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@clack/core": "^0.3.3",
     "@clack/prompts": "^0.7.0",
