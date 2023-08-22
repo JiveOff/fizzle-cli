@@ -33,11 +33,3 @@ const start = async () => {
 };
 
 start();
-
-// const pog = await text({ message: "What is your name?" });
-
-// const test = await spinner("Loading...");
-
-// const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-// await sleep(2000);
