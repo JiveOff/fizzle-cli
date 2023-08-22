@@ -65,7 +65,7 @@ export default async () => {
     defaultValue: parsedPackage.port || 8080,
     validate: (value) => {
       const regex = /^[0-9]+$/;
-      return regex.test(value);
+      return !regex.test(value);
     }
   });
 
