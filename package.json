@@ -1,6 +1,6 @@
 {
   "name": "fizzle-cli",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Launch apps and access them using a *.local domain.",
   "repository": {
     "type": "git",
