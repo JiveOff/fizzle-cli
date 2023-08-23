@@ -6,9 +6,9 @@ A Command Line utility to start local servers under the \*.local domains using D
 
 ## Commands
 
-- `npx fizzle start` - Starts Traefik and the mDNS daemon
-- `npx fizzle stop` - Stops Traefik and the mDNS daemon
-- `npx fizzle up` - Starts your app in a docker container and connects it to the local Traefik network
+- `npx fizzle-cli start` - Starts Traefik and the mDNS daemon
+- `npx fizzle-cli stop` - Stops Traefik and the mDNS daemon
+- `npx fizzle-cli up` - Starts your app in a docker container and connects it to the local Traefik network
 
 ## What it does
 
@@ -24,7 +24,7 @@ The container is then started using the start script that you provided during th
 
 ## Output Example
 
-`npx fizzle start` anywhere on your machine to:
+`npx fizzle-cli start` anywhere on your machine to:
 
 - Create your local certificate
 - Start Traefik
@@ -42,7 +42,7 @@ The container is then started using the start script that you provided during th
 └  Done in 633ms
 ```
 
-`npx fizzle up` in the root of your project directory.
+`npx fizzle-cli up` in the root of your project directory.
 
 ```bash
 ┌  Fizzle CLI 🪣✨
