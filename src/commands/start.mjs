@@ -62,17 +62,10 @@ const setupTraefik = async () => {
     return;
   }
 
-  const traefikImage = await docker.listImages({
-    filters: { reference: ["traefik:latest"] }
-  });
-
-  const { start, stop, message } = spinner("Starting Traefik");
+  const { start, stop, message } = spinner("Pulling Traefik image");
   start();
 
-  if (traefikImage.length === 0) {
-    message("Pulling Traefik image");
-    await docker.pull("traefik:latest");
-  }
+  await docker.pull("traefik:latest");
 
   message("Starting Traefik container");
 
